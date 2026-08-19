@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartShop — Modern Essentials</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="logo" onclick="showPage('home')">Smart<span>Shop</span></div>
+  <nav>
+    <button class="nav-btn active" onclick="showPage('home'); filterCat('All'); scrollToProducts(); setActiveNav(this)">All Products</button>
+    <button class="nav-btn" onclick="showPage('home'); filterCat('Clothing'); scrollToProducts(); setActiveNav(this)">Clothing</button>
+    <button class="nav-btn" onclick="showPage('home'); filterCat('Toys'); scrollToProducts(); setActiveNav(this)">Toys</button>
+    <button class="nav-btn" onclick="showPage('home'); filterCat('Home & Kitchen'); scrollToProducts(); setActiveNav(this)">Home & Kitchen</button>
+  </nav>
+  <div class="header-right">
+    <div class="search-bar">
+      <span class="search-icon">🔍︎</span>
+      <input type="text" id="searchInput" placeholder="Search products..." oninput="handleSearch(this.value)">
+    </div>
+    <button class="cart-btn" onclick="showPage('cart')">
+      🛒 Cart <span class="cart-count" id="cartCount">0</span>
+    </button>
+    <div id="userHeaderArea"></div>
+  </div>
+</header>
+
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" style="position:relative;">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-img" id="modalImg"></div>
+    <div class="modal-body">
+      <div class="modal-cat" id="modalCat"></div>
+      <div class="modal-name" id="modalName"></div>
+      <div class="modal-desc" id="modalDesc"></div>
+      <div class="modal-footer">
+        <div>
+          <div class="modal-price" id="modalPrice"></div>
+          <div class="modal-stock" id="modalStock"></div>
+        </div>
+        <button class="add-btn" id="modalAddBtn" style="font-size:0.95rem; padding:12px 24px;">+ Add to Cart</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div id="toast"></div>
+
+
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-tag">✦ New Collection 2025</div>
+    <h1>Shop <em>Smarter,</em><br>Live Better</h1>
+    <p>Curated essentials across electronics, fashion, and home — quality you can trust, prices you'll love.</p>
+    <button class="hero-cta" onclick="document.getElementById('products-section').scrollIntoView({behavior:'smooth'})">Explore Now ↓</button>
+  </div>
+
+  <div id="products-section">
+    <div class="section-title" id="sectionTitle">All Products <span id="productCount"></span></div>
+    <div class="filters" id="filters">
+      <button class="filter-chip active" onclick="filterCat('All', this)">All</button>
+      <button class="filter-chip" onclick="filterCat('Clothing', this)">Clothing</button>
+      <button class="filter-chip" onclick="filterCat('Toys', this)">Toys</button>
+      <button class="filter-chip" onclick="filterCat('Home & Kitchen', this)">Home & Kitchen</button>
+    </div>
+    <div class="products-grid" id="productsGrid"></div>
+  </div>
+</div>
+
+
+<div class="page" id="page-cart">
+  <div class="cart-container">
+    <h2>Your Basket</h2>
+    <div id="cartContent"></div>
+  </div>
+</div>
+
+
+<div class="page" id="page-checkout">
+  <div class="checkout-container">
+    <h2>Checkout</h2>
+
+    <div class="checkout-steps">
+      <div class="step-indicator active" id="step1ind">
+        <div class="step-num">1</div> Delivery
+      </div>
+      <div class="step-indicator" id="step2ind">
+        <div class="step-num">2</div> Payment
+      </div>
+      <div class="step-indicator" id="step3ind">
+        <div class="step-num">3</div> Review
+      </div>
+    </div>
+
+    <div class="checkout-layout">
+      <div id="checkoutForms">
+
+        
+        <div class="form-panel" id="formStep1">
+          <h3>📦 Delivery Information</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>First Name</label>
+              <input type="text" id="firstName" placeholder="John" required>
+            </div>
+            <div class="form-group">
+              <label>Last Name</label>
+              <input type="text" id="lastName" placeholder="Smith" required>
+            </div>
+            <div class="form-group full">
+              <label>Email Address</label>
+              <input type="email" id="email" placeholder="john@example.com" required>
+            </div>
+            <div class="form-group full">
+              <label>Street Address</label>
+              <input type="text" id="address" placeholder="123 Main Street" required>
+            </div>
+            <div class="form-group">
+              <label>City</label>
+              <input type="text" id="city" placeholder="London" required>
+            </div>
+            <div class="form-group">
+              <label>Postcode</label>
+              <input type="text" id="postcode" placeholder="SW1A 1AA" required>
+            </div>
+            <div class="form-group full">
+              <label>Country</label>
+              <select id="country">
+                <option>United Kingdom</option>
+                <option>United States</option>
+                <option>Canada</option>
+                <option>Australia</option>
+                <option>Sri Lanka</option>
+                <option>Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn-next" onclick="nextStep(1)">Continue to Payment →</button>
+          </div>
+          <div class="form-actions">
+            <button class="btn-nextb" onclick="showPage('home')">← Back to Shopping</button>
+          </div>
+        </div>
+
+        
+        <div class="form-panel" id="formStep2" style="display:none;">
+          <h3>💳 Payment Details</h3>
+          <div class="card-display">
+            <div class="card-chip">💳</div>
+            <div class="card-number" id="displayCardNum">•••• •••• •••• ••••</div>
+            <div class="card-meta">
+              <div class="card-meta-item">Card Holder<div class="card-meta-val" id="displayCardName">FULL NAME</div></div>
+              <div class="card-meta-item">Expires<div class="card-meta-val" id="displayExpiry">MM/YY</div></div>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group full">
+              <label>Name on Card</label>
+              <input type="text" id="cardName" placeholder="JOHN SMITH" oninput="document.getElementById('displayCardName').textContent=this.value||'FULL NAME'" required>
+            </div>
+            <div class="form-group full">
+              <label>Card Number</label>
+              <input type="text" id="cardNum" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCardNum(this)" required>
+            </div>
+            <div class="form-group">
+              <label>Expiry Date</label>
+              <input type="text" id="expiry" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this)" required>
+            </div>
+            <div class="form-group">
+              <label>CVV</label>
+              <input type="password" id="cvv" placeholder="•••" maxlength="4" required>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn-back" onclick="prevStep(2)">← Back</button>
+            <button class="btn-next" onclick="nextStep(2)">Review Order →</button>
+          </div>
+        </div>
+
+        
+        <div class="form-panel" id="formStep3" style="display:none;">
+          <h3>✅ Review Your Order</h3>
+          <div id="reviewDetails"></div>
+          <div class="form-actions" style="margin-top:24px;">
+            <button class="btn-back" onclick="prevStep(3)">← Back</button>
+            <button class="btn-next" onclick="placeOrder()" style="background:#00d4aa;">Place Order 🎉</button>
+          </div>
+        </div>
+
+      </div>
+
+      <div>
+        <div class="order-summary" id="checkoutSummary"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="page" id="page-confirmation">
+  <div class="confirmation">
+    <div class="confirm-icon">✓</div>
+    <h2>Order Placed!</h2>
+    <p>Thank you for shopping with SmartShop. Your order has been confirmed and is being processed.</p>
+    <div class="order-ref" id="orderRef"></div>
+    <div class="confirm-items" id="confirmItems"></div>
+    <p style="font-size:0.85rem; color:var(--muted);">A confirmation will be sent to <strong id="confirmEmail" style="color:var(--text)"></strong></p>
+    <button class="btn-home" onclick="goHome()">← Continue Shopping</button>
+  </div>
+</div>
+
+
+<div class="page" id="page-orders">
+  <div class="cart-container">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;">
+      <h2 style="margin:0;">My Orders</h2>
+      <button class="checkout-btn" style="max-width:200px;margin:0;" onclick="showPage('home')">← Continue Shopping</button>
+    </div>
+    <div id="ordersContent"><div style="text-align:center;padding:60px 20px;color:var(--muted);">Loading orders…</div></div>
+  </div>
+</div>
+
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore, doc, getDoc, setDoc, collection, addDoc,
+  getDocs, query, orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCoRlxI-duS5xUr1KhUSWny9MQp3RQFWbk",
+  authDomain: "smartshop-164c7.firebaseapp.com",
+  projectId: "smartshop-164c7",
+  storageBucket: "smartshop-164c7.firebasestorage.app",
+  messagingSenderId: "1055377102631",
+  appId: "1:1055377102631:web:9218008c5fa2370271bb02",
+  measurementId: "G-KJXC5HK16X"
+};
+
+let fbApp, fbDb;
+try {
+  fbApp = initializeApp(firebaseConfig, "smart-index");
+  fbDb  = getFirestore(fbApp);
+} catch(e) {
+  console.warn("Firebase init failed:", e.message);
+}
+
+async function saveCart(userId, cartData) {
+  if (!fbDb) return;
+  const ref = doc(fbDb, "smart_carts", String(userId));
+  await setDoc(ref, { items: cartData, updatedAt: new Date().toISOString() });
+}
+
+async function loadCart(userId) {
+  if (!fbDb) return null;
+  const ref = doc(fbDb, "smart_carts", String(userId));
+  const snap = await getDoc(ref);
+  return snap.exists() ? snap.data().items : null;
+}
+
+async function saveOrder(userId, order) {
+  if (!fbDb) return;
+  const ref = collection(fbDb, "smart_users", String(userId), "orders");
+  await addDoc(ref, { ...order, savedAt: new Date().toISOString() });
+}
+
+async function loadOrders(userId) {
+  if (!fbDb) return null;
+  try {
+    const ref = collection(fbDb, "smart_users", String(userId), "orders");
+    const q = query(ref, orderBy("savedAt", "desc"));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => d.data());
+  } catch(e) {
+    console.warn("loadOrders failed:", e);
+    return null;
+  }
+}
+
+window._fb = { saveCart, loadCart, saveOrder, loadOrders };
+</script>
+<script src="script.js"></script>
+<script>
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('goto') === 'checkout') {
+    history.replaceState({}, '', window.location.pathname);
+    setTimeout(() => {
+      if (typeof getSession === 'function' && getSession()) showPage('checkout');
+    }, 900);
+  }
+})();
+</script>
+</body>
+</html>
